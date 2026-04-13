@@ -1,6 +1,6 @@
 git_prompt() {
-    inside_repo="$(git rev-parse --is-inside-work-tree)"
-    if [[ "$inside_repo" -eq "true" ]]
+    inside_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
+    if [[ "$?" -eq 0 ]]
     then
         echo "[$(git branch --show-current)]"
     fi

@@ -1,0 +1,43 @@
+# Podman Quadlet file for ComfyUI
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp comfyui.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start comfyui.service
+#   systemctl --user enable comfyui.service   # start on login
+#
+# To have it run even when ridvan isn't logged in:
+#   sudo loginctl enable-linger ridvan
+#
+# Check status/logs with:
+#   systemctl --user status comfyui.service
+#   journalctl --user -u comfyui.service -f
+
+[Unit]
+Description=ComfyUI
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+# Built locally from your Containerfile with: podman build -t comfyui .
+Image=localhost/comfyui:latest
+ContainerName=comfyui
+
+# Expose the web UI on the host
+PublishPort=8188:8188
+
+# Map ~/ai/{models,output,input} into the container
+Volume=%h/ai/models:/opt/ComfyUI/models:Z
+Volume=%h/ai/output:/opt/ComfyUI/output:Z
+Volume=%h/ai/input:/opt/ComfyUI/input:Z
+
+# GPU access (requires nvidia-container-toolkit configured for CDI/rootless podman)
+AddDevice=nvidia.com/gpu=all
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

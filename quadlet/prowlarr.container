@@ -1,0 +1,38 @@
+# Podman Quadlet file for Prowlarr (torrent/usenet indexer manager)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp prowlarr.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start prowlarr.service
+#   systemctl --user enable prowlarr.service   # start on login
+#
+# Web UI: http://localhost:9696   (point Radarr/Sonarr at localhost:9696)
+# Config lives in ~/.config/prowlarr.
+
+[Unit]
+Description=Prowlarr Indexer Manager
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/linuxserver/prowlarr
+ContainerName=prowlarr
+
+# Web UI
+PublishPort=9696:9696
+
+Volume=%h/.config/prowlarr:/config:Z
+
+# PUID/PGID of the host user so config files are owned by you
+Environment=PUID=1000
+Environment=PGID=1000
+# Uncomment to set your timezone (affects log timestamps):
+# Environment=TZ=America/Los_Angeles
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

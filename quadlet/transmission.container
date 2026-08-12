@@ -1,0 +1,49 @@
+# Podman Quadlet file for Transmission (BitTorrent client)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp transmission.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start transmission.service
+#   systemctl --user enable transmission.service   # start on login
+#
+# Web UI: http://localhost:9091   (default no auth — set RPC password in settings.json)
+# Peer port 51413/TCP must be forwarded on the router for good speeds.
+#
+# Data lives under ~/data/downloads/{complete,incomplete} — shared on disk with
+# other containers via the :z label so other services (e.g. a media server) can
+# read finished torrents. Drop .torrent files into ~/data/torrents to auto-start
+# them (image enables watch-dir=/watch on first boot). Config lives in
+# ~/.config/transmission.
+
+[Unit]
+Description=Transmission BitTorrent Client
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/linuxserver/transmission
+ContainerName=transmission
+
+# Web UI
+PublishPort=9091:9091
+# Peer listen port (forward this on the router)
+PublishPort=51413:51413
+
+Volume=%h/data/downloads/complete:/downloads:z
+Volume=%h/data/downloads/incomplete:/downloads/incomplete:z
+Volume=%h/data/torrents:/watch:z
+Volume=%h/.config/transmission:/config:Z
+
+# PUID/PGID of the host user so torrents are owned by you
+Environment=PUID=1000
+Environment=PGID=1000
+# Uncomment to set your timezone (affects log timestamps):
+# Environment=TZ=America/Los_Angeles
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

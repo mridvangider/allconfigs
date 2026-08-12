@@ -1,0 +1,53 @@
+# Podman Quadlet file for qBittorrent (BitTorrent client)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp qbittorrent.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start qbittorrent.service
+#   systemctl --user enable qbittorrent.service   # start on login
+#
+# Web UI: http://localhost:8080
+#   Default login: admin / adminadmin  (change on first login)
+# Peer port 6881/TCP+UDP must be forwarded on the router for good speeds.
+#
+# Data lives under ~/data/downloads (completed torrents are here by default),
+# shared on disk via the :z label so other containers (e.g. a media server)
+# can read finished torrents. Drop .torrent files into ~/data/torrents to
+# auto-start them (image watches /watch). Config lives in
+# ~/.config/qbittorrent.
+
+[Unit]
+Description=qBittorrent BitTorrent Client
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/linuxserver/qbittorrent
+ContainerName=qbittorrent
+
+# Web UI
+PublishPort=8080:8080
+# Peer listen port (forward this on the router)
+PublishPort=6881:6881
+PublishPort=6881:6881/udp
+
+Volume=%h/data/downloads:/downloads:z
+Volume=%h/data/torrents:/watch:z
+Volume=%h/.config/qbittorrent:/config:Z
+
+# PUID/PGID of the host user so torrents are owned by you
+Environment=PUID=1000
+Environment=PGID=1000
+# Uncomment to set your timezone (affects log timestamps):
+# Environment=TZ=America/Los_Angeles
+
+# Enable torrent (incoming connections) UI settings in Web UI (legacy checkbox) to allow peer connections
+Environment=TORRENTING_PORT=6881
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

@@ -10,10 +10,10 @@
 # Web UI: http://localhost:9091   (default no auth — set RPC password in settings.json)
 # Peer port 51413/TCP must be forwarded on the router for good speeds.
 #
-# Data lives under ~/data/downloads/{complete,incomplete} — shared on disk with
-# other containers via the :z label so other services (e.g. a media server) can
-# read finished torrents. Drop .torrent files into ~/data/torrents to auto-start
-# them (image enables watch-dir=/watch on first boot). Config lives in
+# Data lives under ~/data/downloads (completed torrents, by category), shared on
+# disk via the :z label so other containers (e.g. a media server) can read
+# finished torrents. Drop .torrent files into ~/data/torrents to auto-start them
+# (image enables watch-dir=/watch on first boot). Config lives in
 # ~/.config/transmission.
 
 [Unit]
@@ -30,8 +30,7 @@ PublishPort=9091:9091
 # Peer listen port (forward this on the router)
 PublishPort=51413:51413
 
-Volume=%h/data/downloads/complete:/downloads:z
-Volume=%h/data/downloads/incomplete:/downloads/incomplete:z
+Volume=%h/data/downloads:/downloads:z
 Volume=%h/data/torrents:/watch:z
 Volume=%h/.config/transmission:/config:Z
 

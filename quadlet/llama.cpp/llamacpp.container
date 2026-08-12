@@ -1,0 +1,40 @@
+# Podman Quadlet file for llama.cpp server
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp llamacpp.container ~/.config/containers/systemd/
+#   cp llamacpp.env ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start llamacpp.service
+#   systemctl --user enable llamacpp.service   # start on login
+#
+# To have it run even when ridvan isn't logged in:
+#   sudo loginctl enable-linger ridvan
+#
+# Check status/logs with:
+#   systemctl --user status llamacpp.service
+#   journalctl --user -u llamacpp.service -f
+
+[Unit]
+Description=llama.cpp Inference Server
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/ggerganov/llama.cpp:server
+ContainerName=llamacpp
+
+PublishPort=8080:8080
+
+Volume=%h/ai/models/llm:/models:z
+
+EnvironmentFile=llamacpp.env
+
+AddDevice=nvidia.com/gpu=all
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

@@ -19,6 +19,9 @@ Wants=network-online.target
 Image=ghcr.io/linuxserver/prowlarr
 ContainerName=prowlarr
 
+# Shared media stack network — reach peers by name (sonarr:8989, radarr:7878)
+Network=media.network
+
 # Web UI
 PublishPort=9696:9696
 
@@ -27,6 +30,8 @@ Volume=%h/.config/prowlarr:/config:Z
 # PUID/PGID of the host user so config files are owned by you
 Environment=PUID=1000
 Environment=PGID=1000
+# Keep the host user's UID inside the user namespace
+UserNS=keep-id
 # Uncomment to set your timezone (affects log timestamps):
 # Environment=TZ=America/Los_Angeles
 

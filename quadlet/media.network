@@ -1,0 +1,23 @@
+# Podman Quadlet network for the *arr media stack
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp media.network ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#
+# Containers that set Network=media.network (qbittorrent, prowlarr, sonarr,
+# radarr) can reach each other by container name, e.g. sonarr can use
+# http://qbittorrent:8080 as its download client host instead of localhost.
+# The network itself is not a service; just restart the containers after
+# daemon-reload.
+
+[Unit]
+Description=Media stack shared network
+
+[Network]
+NetworkName=media
+# Container-name DNS resolution is on by default (aardvark-dns);
+# set DisableDNS=true here if it ever needs to be turned off.
+
+[Install]
+WantedBy=default.target

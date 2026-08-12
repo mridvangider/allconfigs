@@ -1,0 +1,46 @@
+# Podman Quadlet file for Sonarr (TV series manager)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp sonarr.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start sonarr.service
+#   systemctl --user enable sonarr.service   # start on login
+#
+# Web UI: http://localhost:8989
+# Shares /data with qbittorrent (same paths on both sides, so no remote
+# path mapping is needed): downloads land in /data/downloads/tv, library
+# root folder is /data/media/tv. Config lives in ~/.config/sonarr.
+
+[Unit]
+Description=Sonarr TV Series Manager
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/linuxserver/sonarr
+ContainerName=sonarr
+
+# Shared media stack network — reach peers by name (qbittorrent:8080, etc.)
+Network=media.network
+
+# Web UI
+PublishPort=8989:8989
+
+Volume=/data:/data:z
+Volume=%h/.config/sonarr:/config:Z
+
+# PUID/PGID of the host user so media files are owned by you
+Environment=PUID=1000
+Environment=PGID=1000
+# Keep the host user's UID inside the user namespace
+UserNS=keep-id
+# Uncomment to set your timezone (affects log timestamps):
+# Environment=TZ=America/Los_Angeles
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

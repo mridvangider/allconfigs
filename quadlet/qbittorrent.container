@@ -26,19 +26,23 @@ Wants=network-online.target
 Image=ghcr.io/linuxserver/qbittorrent
 ContainerName=qbittorrent
 
+# Shared media stack network — peers reach this as qbittorrent:8080
+Network=media.network
+
 # Web UI
 PublishPort=8080:8080
 # Peer listen port (forward this on the router)
 PublishPort=6881:6881
 PublishPort=6881:6881/udp
 
-Volume=%h/data/downloads:/downloads:z
-Volume=%h/data/torrents:/watch:z
+Volume=/data:/data:z
 Volume=%h/.config/qbittorrent:/config:Z
 
 # PUID/PGID of the host user so torrents are owned by you
 Environment=PUID=1000
 Environment=PGID=1000
+# Keep the host user's UID inside the user namespace
+UserNS=keep-id
 # Uncomment to set your timezone (affects log timestamps):
 # Environment=TZ=America/Los_Angeles
 

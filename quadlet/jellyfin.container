@@ -1,0 +1,57 @@
+# Podman Quadlet file for Jellyfin (media server)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp jellyfin.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start jellyfin.service
+#   systemctl --user enable jellyfin.service   # start on login
+#
+# Web UI: http://localhost:8096
+# Serves the libraries that sonarr/radarr populate under /data/media,
+# mounted read-only. Config lives in ~/.config/jellyfin; cache is kept
+# inside the container (rebuilt automatically).
+#
+# NOTE: this uses the official jellyfin image, not linuxserver — the
+# linuxserver s6 init is incompatible with UserNS=keep-id
+# (s6-applyuidgid setgroups EPERM crash loop).
+#
+# Not on the media network — it doesn't need to talk to the *arr
+# containers. Add Network=media.network if you later pair it with
+# something like jellyseerr.
+
+[Unit]
+Description=Jellyfin Media Server
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/jellyfin/jellyfin
+ContainerName=jellyfin
+
+# Web UI
+PublishPort=8096:8096
+
+# Media library, read-only (sonarr/radarr own the files)
+Volume=/data/media:/data/media:ro,z
+Volume=%h/.config/jellyfin:/config:Z
+
+# Keep the host user's UID inside the user namespace so config files
+# stay owned by you
+UserNS=keep-id
+User=1000:1000
+# Uncomment to set your timezone (affects log timestamps):
+# Environment=TZ=America/Los_Angeles
+
+# GPU access for NVENC/NVDEC hardware transcoding (requires
+# nvidia-container-toolkit configured for CDI/rootless podman, same as
+# the comfyui/llamacpp quadlets). Enable hardware acceleration in
+# Dashboard -> Playback -> Transcoding.
+AddDevice=nvidia.com/gpu=all
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

@@ -39,7 +39,7 @@ PublishPort=3001:3000
 
 # As of homepage v1.0 only localhost:3000 is allowed by default; the
 # client Host header (host:port as you reach it) must be listed here.
-Environment=HOMEPAGE_ALLOWED_HOSTS=localhost:3001,127.0.0.1:3001,homeserver:3001,192.168.1.24:3001
+Environment=HOMEPAGE_ALLOWED_HOSTS=localhost:3001,127.0.0.1:3001,homepage:3001,192.168.1.24:3001
 
 Volume=%h/.config/homepage:/app/config:Z
 

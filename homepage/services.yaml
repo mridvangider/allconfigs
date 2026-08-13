@@ -1,0 +1,46 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+#
+# Homepage runs on the media network, so the *arr services below are
+# reached by container name. Services not on that network (jellyfin,
+# open-webui, comfyui, llamacpp) are reached through the host-gateway
+# alias (host.containers.internal) on their published host port.
+
+- Media:
+    - Sonarr:
+        href: http://sonarr:8989
+        siteMonitor: http://sonarr:8989
+        description: TV shows
+    - Radarr:
+        href: http://radarr:7878
+        siteMonitor: http://radarr:7878
+        description: Movies
+    - Prowlarr:
+        href: http://prowlarr:9696
+        siteMonitor: http://prowlarr:9696
+        description: Indexer management
+    - qBittorrent:
+        href: http://qbittorrent:8080
+        siteMonitor: http://qbittorrent:8080
+        description: Download client
+
+- Media Servers:
+    - Jellyfin:
+        href: http://host.containers.internal:8096
+        siteMonitor: http://host.containers.internal:8096
+        description: Media server
+
+- AI:
+    - Open WebUI:
+        href: http://host.containers.internal:3000
+        siteMonitor: http://host.containers.internal:3000
+        description: LLM chat interface
+    - ComfyUI:
+        href: http://host.containers.internal:8188
+        siteMonitor: http://host.containers.internal:8188
+        description: Stable Diffusion workflow UI
+    - llama.cpp:
+        href: http://host.containers.internal:8080
+        siteMonitor: http://host.containers.internal:8080
+        description: LLM inference server

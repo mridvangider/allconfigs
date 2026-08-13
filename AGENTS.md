@@ -4,7 +4,7 @@ Dotfiles / config sources for a single user (rootless podman quadlets, Neovim, b
 
 ## Deploying (how these reach the machine)
 
-- `./install.sh` symlinks everything into place: `.bashrc`→`~/.bashrc`, `.bashrc.d`→`~/.bashrc.d`, `nvim`→`~/.config/nvim`, `.tmux.conf`→`~/.tmux.conf`, `alacritty.toml`→`~/.config/alacritty/alacritty.toml`, each file in `quadlet/` and `quadlet/llama.cpp/`→`~/.config/containers/systemd/`. Re-runnable (`ln -sf`).
+- `./install.sh` symlinks everything into place: `.bashrc`→`~/.bashrc`, `.bashrc.d`→`~/.bashrc.d`, `nvim`→`~/.config/nvim`, `.tmux.conf`→`~/.tmux.conf`, `alacritty.toml`→`~/.config/alacritty/alacritty.toml`, `homepage/`→`~/.config/homepage` (the homepage quadlet bind-mounts this dir), each file in `quadlet/` and `quadlet/llama.cpp/`→`~/.config/containers/systemd/`. Re-runnable (`ln -sf`/`ln -sfn`).
 - Quadlet symlinks pickup requires a reload/start after `install.sh`: `systemctl --user daemon-reload && systemctl --user start comfyui.service` (etc). Unit sections live in file comments. GPU quadlets (`comfyui`, `llamacpp`) need nvidia-container-toolkit CDI and `# AddDevice=nvidia.com/gpu=all`.
 - `llamacpp.env` is symlinked next to `llamacpp.container` only because `install.sh` flattens both into `~/.config/containers/systemd/` — `EnvironmentFile=llamacpp.env` resolves relative to that dir, not the repo. New quadlet files must not collide by basename. Model files go in `~/ai/models/...`.
 

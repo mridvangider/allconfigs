@@ -12,6 +12,9 @@ ln -sf "$SCRIPT_DIR/.tmux.conf" "$HOME/.tmux.conf"
 mkdir -p "$HOME/.config/alacritty"
 ln -sf "$SCRIPT_DIR/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
 
+# Homepage dashboard config
+ln -sfn "$SCRIPT_DIR/homepage" "$HOME/.config/homepage"
+
 # Podman Quadlet user services
 mkdir -p "$HOME/.config/containers/systemd"
 find "$SCRIPT_DIR/quadlet" -type f -print0 | while IFS= read -r -d '' f; do

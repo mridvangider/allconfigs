@@ -1,0 +1,48 @@
+# Podman Quadlet file for AdGuard Home (network-wide DNS filter)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp adguardhome.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start adguardhome.service
+#   systemctl --user enable adguardhome.service   # start on login
+#
+# REQUIRED host change first — rootless pasta can't bind ports < 1024
+# while net.ipv4.ip_unprivileged_port_start=1024:
+#   sudo sysctl -w net.ipv4.ip_unprivileged_port_start=0
+#   echo 'net.ipv4.ip_unprivileged_port_start = 0' | sudo tee /etc/sysctl.d/10-adguardhome.conf
+#   sudo sysctl --system
+#
+# Web admin (first run): http://192.168.1.24:3002
+# Bind address: 192.168.1.24 (enp37s0) only — loopback DNS stays with
+# systemd-resolved. Fallback if pasta ignores the IP: use 0.0.0.0.
+
+[Unit]
+Description=AdGuard Home DNS
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/adguard/adguardhome:latest
+ContainerName=adguardhome
+
+PublishPort=192.168.1.24:53:53/udp
+PublishPort=192.168.1.24:53:53/tcp
+PublishPort=192.168.1.24:3002:3000
+
+Volume=%h/.config/adguardhome/work:/opt/adguardhome/work:Z
+Volume=%h/.config/adguardhome/conf:/opt/adguardhome/conf:Z
+
+# AdGuard Home must run as root on first launch ("run it as
+# administrator"), but in rootless podman container root already maps to
+# your host uid — no keep-id needed, files land owned by you.
+# NET_ADMIN/NET_RAW are the official image's recommended caps.
+AddCapability=NET_ADMIN
+AddCapability=NET_RAW
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

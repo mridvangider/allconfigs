@@ -14,10 +14,9 @@
 # widgets.yaml, ...). The container writes back to it, so it runs with
 # keep-id as your user like the jellyfin quadlet.
 #
-# Networking: on the media network, so service widgets can reach the
-# *arr containers by name (sonarr:8989, radarr:7878, qbittorrent:8080,
-# prowlarr:9696). Services NOT on that network (jellyfin, open-webui,
-# llamacpp) are reachable via host.containers.internal:<host port>.
+# Networking: on the shared home network, so service widgets can reach every
+# service by container name (sonarr:8989, radarr:7878, qbittorrent:8080,
+# prowlarr:9696, jellyfin:8096, open-webui:8080, comfyui:8188, llamacpp:8080).
 #
 # If you ever serve this through a reverse proxy on another host, set:
 #   Environment=HOMEPAGE_ALLOWED_HOSTS=your.domain
@@ -31,20 +30,18 @@ Wants=network-online.target
 Image=ghcr.io/gethomepage/homepage:latest
 ContainerName=homepage
 
-# Shared media stack network — reach peers by name
-Network=media.network
+# Shared home network — reach peers by name
+Network=home.network
 
 # Web UI (3000 on the host belongs to open-webui)
 PublishPort=3001:3000
 
 # As of homepage v1.0 only localhost:3000 is allowed by default; the
 # client Host header (host:port as you reach it) must be listed here.
-Environment=HOMEPAGE_ALLOWED_HOSTS=localhost:3001,127.0.0.1:3001,homepage:3001,192.168.1.24:3001
+# The .gider names are what caddy forwards (it passes the Host header through).
+Environment=HOMEPAGE_ALLOWED_HOSTS=localhost:3001,127.0.0.1:3001,homepage:3001,192.168.1.24:3001,home.gider,homepage.gider
 
 Volume=%h/.config/homepage:/app/config:Z
-
-# Reach host-published services (jellyfin:8096, open-webui:3000, ...)
-AddHost=host.containers.internal:host-gateway
 
 # Keep the host user's UID inside the user namespace so config files
 # stay owned by you

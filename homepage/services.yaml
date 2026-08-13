@@ -2,45 +2,44 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 #
-# Homepage runs on the media network, so the *arr services below are
-# reached by container name. Services not on that network (jellyfin,
-# open-webui, comfyui, llamacpp) are reached through the host-gateway
-# alias (host.containers.internal) on their published host port.
+# href = public name through Caddy (http://<svc>.gider), since the browser
+# can't resolve podman container names. siteMonitor = container name, since
+# homepage runs its checks from inside the home network.
 
 - Media:
     - Sonarr:
-        href: http://sonarr:8989
+        href: http://sonarr.gider
         siteMonitor: http://sonarr:8989
         description: TV shows
     - Radarr:
-        href: http://radarr:7878
+        href: http://radarr.gider
         siteMonitor: http://radarr:7878
         description: Movies
     - Prowlarr:
-        href: http://prowlarr:9696
+        href: http://prowlarr.gider
         siteMonitor: http://prowlarr:9696
         description: Indexer management
     - qBittorrent:
-        href: http://qbittorrent:8080
+        href: http://qbittorrent.gider
         siteMonitor: http://qbittorrent:8080
         description: Download client
 
 - Media Servers:
     - Jellyfin:
-        href: http://host.containers.internal:8096
-        siteMonitor: http://host.containers.internal:8096
+        href: http://jellyfin.gider
+        siteMonitor: http://jellyfin:8096
         description: Media server
 
 - AI:
     - Open WebUI:
-        href: http://host.containers.internal:3000
-        siteMonitor: http://host.containers.internal:3000
+        href: http://open-webui.gider
+        siteMonitor: http://open-webui:8080
         description: LLM chat interface
     - ComfyUI:
-        href: http://host.containers.internal:8188
-        siteMonitor: http://host.containers.internal:8188
+        href: http://comfyui.gider
+        siteMonitor: http://comfyui:8188
         description: Stable Diffusion workflow UI
     - llama.cpp:
-        href: http://host.containers.internal:8080
-        siteMonitor: http://host.containers.internal:8080
+        href: http://llamacpp.gider
+        siteMonitor: http://llamacpp:8080
         description: LLM inference server

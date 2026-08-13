@@ -1,0 +1,31 @@
+# Podman Quadlet network shared by the home services
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp home.network ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#
+# Containers that set Network=home.network (comfyui, homepage, jellyfin,
+# llamacpp, openwebui, prowlarr, qbittorrent, radarr, sonarr) can reach each
+# other by container name, e.g. sonarr can use http://qbittorrent:8080 as its
+# download client host instead of localhost. The network itself is not a
+# service; just restart the containers after daemon-reload.
+#
+# NOTE: adguardhome deliberately stays on the default pasta network — its DNS
+# listeners bind the host IP 192.168.1.24, which only exists in the shared
+# host netns. Its web admin is reached from the home network via
+# host.containers.internal:3002.
+#
+# This used to be media.network — the old "media" podman network object was
+# removed (podman network rm -f media) after the rename.
+
+[Unit]
+Description=Home services shared network
+
+[Network]
+NetworkName=home
+# Container-name DNS resolution is on by default (aardvark-dns);
+# set DisableDNS=true here if it ever needs to be turned off.
+
+[Install]
+WantedBy=default.target

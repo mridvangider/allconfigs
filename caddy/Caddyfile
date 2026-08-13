@@ -1,0 +1,52 @@
+# Caddyfile for the homeserver reverse proxy (http://<svc>.gider)
+#
+# HTTP-only on purpose: *.gider and home.gider are internal names, so the
+# http:// prefix keeps Caddy from trying to get public TLS certs.
+#
+# DNS: resolve *.gider and home.gider to 192.168.1.24 (e.g. an AdGuard Home
+# DNS rewrite / wildcard A record, or per-machine /etc/hosts entries). Caddy
+# binds host ports 80 (HTTP) and 443 (reserved for a future public domain /
+# private CA).
+#
+# Everything on the home network is reached by container name; only
+# adguardhome (on the pasta network) is reached via host.containers.internal.
+
+http://home.gider, http://homepage.gider {
+	reverse_proxy homepage:3000
+}
+
+http://sonarr.gider {
+	reverse_proxy sonarr:8989
+}
+
+http://radarr.gider {
+	reverse_proxy radarr:7878
+}
+
+http://prowlarr.gider {
+	reverse_proxy prowlarr:9696
+}
+
+http://qbittorrent.gider {
+	reverse_proxy qbittorrent:8080
+}
+
+http://jellyfin.gider {
+	reverse_proxy jellyfin:8096
+}
+
+http://open-webui.gider {
+	reverse_proxy open-webui:8080
+}
+
+http://comfyui.gider {
+	reverse_proxy comfyui:8188
+}
+
+http://llamacpp.gider {
+	reverse_proxy llamacpp:8080
+}
+
+http://adguard.gider {
+	reverse_proxy host.containers.internal:3002
+}

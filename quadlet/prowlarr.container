@@ -19,8 +19,8 @@ Wants=network-online.target
 Image=ghcr.io/linuxserver/prowlarr
 ContainerName=prowlarr
 
-# Shared media stack network — reach peers by name (sonarr:8989, radarr:7878)
-Network=media.network
+# Shared home network — reach peers by name (sonarr:8989, radarr:7878)
+Network=home.network
 
 # Web UI
 PublishPort=9696:9696

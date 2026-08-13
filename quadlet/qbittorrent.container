@@ -26,8 +26,8 @@ Wants=network-online.target
 Image=ghcr.io/linuxserver/qbittorrent
 ContainerName=qbittorrent
 
-# Shared media stack network — peers reach this as qbittorrent:8080
-Network=media.network
+# Shared home network — peers reach this as qbittorrent:8080
+Network=home.network
 
 # Web UI
 PublishPort=8080:8080

@@ -16,9 +16,9 @@
 # linuxserver s6 init is incompatible with UserNS=keep-id
 # (s6-applyuidgid setgroups EPERM crash loop).
 #
-# Not on the media network — it doesn't need to talk to the *arr
-# containers. Add Network=media.network if you later pair it with
-# something like jellyseerr.
+# On the shared home network — reachable by name (jellyfin:8096), and it
+# can reach the *arr containers by name if you later pair it with something
+# like jellyseerr.
 
 [Unit]
 Description=Jellyfin Media Server
@@ -31,6 +31,9 @@ ContainerName=jellyfin
 
 # Web UI
 PublishPort=8096:8096
+
+# Shared home network — reach peers by name, reachable as jellyfin:8096
+Network=home.network
 
 # Media library, read-only (sonarr/radarr own the files)
 Volume=/data/media:/data/media:ro,z

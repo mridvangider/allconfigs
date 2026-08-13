@@ -21,8 +21,8 @@ Wants=network-online.target
 Image=ghcr.io/linuxserver/sonarr
 ContainerName=sonarr
 
-# Shared media stack network — reach peers by name (qbittorrent:8080, etc.)
-Network=media.network
+# Shared home network — reach peers by name (qbittorrent:8080, etc.)
+Network=home.network
 
 # Web UI
 PublishPort=8989:8989

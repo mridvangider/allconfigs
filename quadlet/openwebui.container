@@ -6,6 +6,9 @@ After=network-online.target
 Image=ghcr.io/open-webui/open-webui:main
 ContainerName=open-webui
 PublishPort=3000:8080
+
+# Shared home network — reachable as open-webui:8080, peers by name
+Network=home.network
 Volume=open-webui:/app/backend/data
 AddHost=host.containers.internal:host-gateway
 

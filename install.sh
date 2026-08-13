@@ -15,8 +15,19 @@ ln -sf "$SCRIPT_DIR/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
 # Homepage dashboard config
 ln -sfn "$SCRIPT_DIR/homepage" "$HOME/.config/homepage"
 
+# Caddy reverse proxy config
+ln -sfn "$SCRIPT_DIR/caddy" "$HOME/.config/caddy"
+
 # Podman Quadlet user services
 mkdir -p "$HOME/.config/containers/systemd"
+# Prune stale symlinks (e.g. after a quadlet rename) whose target no longer
+# exists, so they don't linger as broken systemd units.
+find "$HOME/.config/containers/systemd" -maxdepth 1 -type l -print0 | while IFS= read -r -d '' l; do
+    target="$(readlink -f "$l")"
+    case "$target" in
+        "$SCRIPT_DIR/quadlet"/*) [ -e "$target" ] || rm -f "$l" ;;
+    esac
+done
 find "$SCRIPT_DIR/quadlet" -type f -print0 | while IFS= read -r -d '' f; do
     ln -sf "$f" "$HOME/.config/containers/systemd/$(basename "$f")"
 done

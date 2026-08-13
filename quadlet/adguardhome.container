@@ -32,6 +32,11 @@ PublishPort=192.168.1.24:53:53/udp
 PublishPort=192.168.1.24:53:53/tcp
 PublishPort=192.168.1.24:3002:80
 
+# NOTE: stays on the default pasta network (not home.network). Its DNS
+# listeners bind to the host IP 192.168.1.24, which only exists in the
+# shared host netns — on a bridge network the container would get its own IP
+# and crash with "bind: cannot assign requested address".
+
 Volume=%h/.config/adguardhome/work:/opt/adguardhome/work:Z
 Volume=%h/.config/adguardhome/conf:/opt/adguardhome/conf:Z
 

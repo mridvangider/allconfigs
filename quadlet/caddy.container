@@ -1,0 +1,58 @@
+# Podman Quadlet file for Caddy (reverse proxy)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd
+#   cp caddy.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start caddy.service
+#   systemctl --user enable caddy.service   # start on login
+#
+# Web: http://home.gider (and *.gider) -> proxy
+# Config lives in ~/.config/caddy/Caddyfile (repo caddy/ dir, bind-mounted
+# read-only below). Reload the config without restarting the container:
+#   podman exec caddy caddy reload --config /etc/caddy/Caddyfile
+#
+# Host ports 80/443: works rootless because ip_unprivileged_port_start is 0
+# (see the adguardhome quadlet). Only 80 is used (HTTP-only for the internal
+# .gider names); 443 is published but idle until a public domain or private CA
+# is added — then drop the http:// prefixes in the Caddyfile.
+#
+# Networking: on the shared home network, so upstreams are reached by
+# container name (sonarr:8989, jellyfin:8096, homepage:3000, ...). adguardhome
+# is on pasta, so it's proxied via host.containers.internal:3002.
+
+[Unit]
+Description=Caddy Reverse Proxy
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/library/caddy:latest
+ContainerName=caddy
+
+# HTTP + HTTPS (443 idle until TLS is enabled)
+PublishPort=80:80
+PublishPort=443:443
+
+# Shared home network — reach upstreams by name
+Network=home.network
+
+# Reach pasta-only services (adguardhome web admin) via the host gateway
+AddHost=host.containers.internal:host-gateway
+
+# Caddyfile + snippets (read-only); certs/state live in named volumes
+Volume=%h/.config/caddy:/etc/caddy:Z
+Volume=caddy-data:/data
+Volume=caddy-config:/config
+
+# The official caddy image runs as UID 1000; keep-id maps it to your host
+# UID so it can read the bind-mounted Caddyfile.
+UserNS=keep-id
+User=1000:1000
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

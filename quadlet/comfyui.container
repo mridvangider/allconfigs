@@ -27,6 +27,9 @@ ContainerName=comfyui
 # Expose the web UI on the host
 PublishPort=8188:8188
 
+# Shared home network — reachable as comfyui:8188, peers by name
+Network=home.network
+
 # Map ~/ai/{models,output,input} into the container
 Volume=%h/ai/models:/opt/ComfyUI/models:Z
 Volume=%h/ai/output:/opt/ComfyUI/output:Z

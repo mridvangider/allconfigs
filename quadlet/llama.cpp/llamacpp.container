@@ -24,7 +24,12 @@ Wants=network-online.target
 Image=ghcr.io/ggerganov/llama.cpp:server
 ContainerName=llamacpp
 
-PublishPort=8080:8080
+# Host port 8888 (not 8080) so it doesn't clash with qbittorrent's published
+# 8080.
+PublishPort=8888:8080
+
+# Shared home network — reachable as llamacpp:8080, peers by name
+Network=home.network
 
 Volume=%h/ai/models/llm:/models:z
 

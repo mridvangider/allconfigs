@@ -14,6 +14,8 @@
 #   sudo sysctl --system
 #
 # Web admin (first run): http://192.168.1.24:3002
+# After first-run setup the web server moves to container port 80
+# (AdGuard Home's default), published as 3002 on the host.
 # Bind address: 192.168.1.24 (enp37s0) only — loopback DNS stays with
 # systemd-resolved. Fallback if pasta ignores the IP: use 0.0.0.0.
 
@@ -28,7 +30,7 @@ ContainerName=adguardhome
 
 PublishPort=192.168.1.24:53:53/udp
 PublishPort=192.168.1.24:53:53/tcp
-PublishPort=192.168.1.24:3002:3000
+PublishPort=192.168.1.24:3002:80
 
 Volume=%h/.config/adguardhome/work:/opt/adguardhome/work:Z
 Volume=%h/.config/adguardhome/conf:/opt/adguardhome/conf:Z

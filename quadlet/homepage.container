@@ -1,0 +1,57 @@
+# Podman Quadlet file for Homepage (gethomepage dashboard)
+#
+# Install as a rootless user service:
+#   mkdir -p ~/.config/containers/systemd ~/.config/homepage
+#   cp homepage.container ~/.config/containers/systemd/
+#   systemctl --user daemon-reload
+#   systemctl --user start homepage.service
+#   systemctl --user enable homepage.service   # start on login
+#
+# Web UI: http://localhost:3001
+# (host port 3000 is taken by open-webui, so this publishes on 3001)
+#
+# Config lives in ~/.config/homepage (settings.yaml, services.yaml,
+# widgets.yaml, ...). The container writes back to it, so it runs with
+# keep-id as your user like the jellyfin quadlet.
+#
+# Networking: on the media network, so service widgets can reach the
+# *arr containers by name (sonarr:8989, radarr:7878, qbittorrent:8080,
+# prowlarr:9696). Services NOT on that network (jellyfin, open-webui,
+# llamacpp) are reachable via host.containers.internal:<host port>.
+#
+# If you ever serve this through a reverse proxy on another host, set:
+#   Environment=HOMEPAGE_ALLOWED_HOSTS=your.domain
+
+[Unit]
+Description=Homepage Dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/gethomepage/homepage:latest
+ContainerName=homepage
+
+# Shared media stack network — reach peers by name
+Network=media.network
+
+# Web UI (3000 on the host belongs to open-webui)
+PublishPort=3001:3000
+
+Volume=%h/.config/homepage:/app/config:Z
+
+# Reach host-published services (jellyfin:8096, open-webui:3000, ...)
+AddHost=host.containers.internal:host-gateway
+
+# Keep the host user's UID inside the user namespace so config files
+# stay owned by you
+UserNS=keep-id
+User=1000:1000
+# Uncomment to set your timezone (affects log timestamps):
+# Environment=TZ=America/Los_Angeles
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target
